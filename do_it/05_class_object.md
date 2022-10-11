@@ -1,3 +1,6 @@
+## 요약 정리
+![image](https://user-images.githubusercontent.com/104348646/195062188-e95ebbb0-aa50-4f47-9852-78d4754cb721.png)
+
 ## 05-1 객체 지향 프로그래밍과 클래스
 * 객체와 객체 지향 프로그래밍
     - 객체(object)  
@@ -183,8 +186,8 @@ public class Student {
 
 * 함수 호출과 스택 메모리
     - 스택(stack)
-        : 함수가 호출될 때 사용하는 메모리
-        (((캡쳐 1)))
+        : 함수가 호출될 때 사용하는 메모리  
+        ![image](https://user-images.githubusercontent.com/104348646/195063728-ffe836a3-59a3-4dbb-b34d-b15e48a8ff4a.png)  
         + 메모리 생성 과정
             1. main() 함수의 스택 생성  
             2. main()에서 add() 호출  
@@ -339,13 +342,322 @@ public class StudentTest{
         Student student1 = new Student();
         Student student2 = new Student();
         ```
-        ![image](https://user-images.githubusercontent.com/104348646/194532897-e7c956e0-2619-47bd-baf6-01b4a34e3a3a.png)  
+        ![image](https://user-images.githubusercontent.com/104348646/195062960-7f627d8d-0ab9-40c4-8c98-ab749f163c18.png)  
         + 클래스에서 선언한 멤버 변수 = 인스턴스 변수(멤버 변수를 저장하는 공간이 매번 따로 생김)
 
     - 참조 변수와 참조 값
         + 참조 변수: 힙 메모리에 생성된 인스턴스
+            ```
+            # 참조 변수 값 출력
+
+            public class StudentTest{
+                // main() 함수
+                public static void main(String[] args){
+                    Student student1 = new Student(); // Student1: 인스턴스
+                    student1.studentName = "james";
+
+                    Student student2 = new Student(); // Student2: 인스턴스
+                    student2.studentName = "chris";
+
+                    System.out.println(student1); // 참조 변수 값 @@ classpart.Student@16f65612
+                    System.out.println(student2); // 참조 변수 값 @@ classpart.Student@311d617d
+                }
+            }
+            ```
+        + 참조 값(= 해시 코드= hash code): 힙 메모리에 생성된 인스턴스의 메모리 주소
+            + [클래스 이름]@[주소 값]
+            + JVM에서 객체가 생성되었을 때, 생성된 객체에 할당하는 가상 주소
+        ![image](https://user-images.githubusercontent.com/104348646/195063110-ba54c7df-7ba2-4019-ae64-db3ca4dac476.png)  
+
+## 05-5 생성자
+* 생성자(constructor)  
+    : 인스턴스를 초기화 할 때의 명령어 집합
+    - 생성자의 이름 = 클래스의 이름
+    - 메소드 아님 -> 상속되지 않음 + 리턴 값 없음
+    - 하나의 클래스에는 반드시 하나 이상의 생성자가 존재
+    ```
+    <modifiers> <class_name>([<argument_list>])
+    {
+        [<statements>]
+    }
+    ```
+    ```
+    # 생성자 만들기
+    package constructor;
+
+    public class Person{
+        String name;
+        float height;
+        float weight;
+    }
+
+    # 생성자 테스트하기
+    package constructor;
+
+    public class PersonTest{
+        public static void main(String[] args){
+            Person personLee = new Person(); // Person(): 생성자
+        }
+    }
+    ```
+
+    - 디폴트 생성자(default constructor)  
+        : 생성자가 없는 클래스에서 클래스 파일을 컴파일 할 때, 자바 컴파일러에서 자동으로 생성함
+        + 매개 변수, 구현 코드 없음
+        + 매개 변수를 추가하면, 디폴트 생성자는 제공되지 않음
         ```
-        # 참조 변수 값 출력
-        System.out.println(student1);
-        System.out.println(student2);
+        package constructor;
+
+        public class Person{
+            String name;
+            float height;
+            float weight;
+
+            public Person(){} // 디폴트 생성자
+        }
         ```
+    - 생성자 만들기
+        + 주로 멤버 변수에 대한 값들을 매개변수로 받아서 인스턴스가 새로 생성될 때, 변수 값들을 초기화함
+        ```
+        # 생성자 만들기
+        package constructor;
+
+        public class Person{
+            String name;
+            float height;
+            float weight;
+
+            public Person(String pname){ // 사람 이름을 매개변수로 입력받아서 Person 클래스를 생성하는 생성자
+                name = pname;
+            }
+        }
+
+        # 생성자 테스트(error)
+        package constructor;
+
+        public class PersonTest{
+            public static void main(String[] args){
+                Person personLee = new Person(); // error: 디폴트 생성자가 없음
+            }
+        }
+
+        # 디폴트 생성자 직접 추가하기
+        package constructor;
+
+        public class Person{
+            String name;
+            float height;
+            float weight;
+
+            public Person(){} // 디폴트 생성자 직접 추가
+
+            public Person(String pname){
+                name = pname;
+            }
+        }
+        ```
+
+* 생성자 오버로드(constructor overload)  
+    : 생성자가 두 개 이상 제공되는 경우
+    - 원하는 생성자를 선택해 사용 가능
+    ```
+    public class Student{
+        int studentID;
+
+        public.Student(int studentID){
+            this.studentID = studentID;
+            // 학번을 매개변수로 입력받아 Student 클래스를 생성하는 생성자
+            // 학생을 생성할 때, 학번이 반드시 필요 -> 디폴트 생성자를 구현하지 않음
+        }
+    }
+    ```
+    ```
+    # 생성자 사용하기
+    package constructor;
+
+    public class Person{
+        String name;
+        float height;
+        float weight;
+
+        public Person(){} // 디폴트 생성자
+
+        public Person(String pname){ // 이름을 매개변수로 입력받는 생성자
+            name = pname;
+        }
+
+        public Person(String pname, float pheight, float pweight){ // 이름, 키, 몸무게를 매개변수로 입력받는 생성자
+            name = pname;
+            height = pheight;
+            weight = pweight;
+        }
+    }
+
+    # 클래스 테스트 구현하기
+    package constructor;
+
+    public class PersonTest{
+        public static void main(String[] args){
+            // 디폴트 생성자로 클래스를 생성한 후, 인스턴스 변수 값을 따로 초기화
+            Person personKim = new Person();
+            personKim.name = "Kim";
+            personKim.height = 180.0F;
+            personKim.wight = 85.5F;
+
+            Person personLee = new Person("Lee", 175, 75); // 인스턴스 변수 초기화와 동시에 클래스 생성
+        }
+    }
+    ```
+
+## 05-6 참조 자료형
+* 참조 자료형  
+    : 클래스 형으로 선언하는 자료형
+    - Sting, Date, 클래스 등
+    ```
+    # 학생 클래스 만들기
+    package reference;
+
+    public class Student1{
+        int studentID;
+        String studentName; // String: 참조 자료형
+        int koreaScore;
+        int mathScore;
+        Sting koreadSubject;
+        String mathSubject;
+    }
+
+    # 과목 클래스와 학생 클래스로 쪼개기
+    ## 과목 클래스 만들기
+    package reference;
+
+    public class Subject{
+        String SubjectName;
+        int scorePoint;
+    }
+    ## 학생 클래스 만들기
+    package reference;
+
+    public class StudentNew{
+        int studentID;
+        String studentNmea;
+        Subject korean; // Subject형을 사용하여 선언
+        Subject math;
+    }
+    ```
+
+## 05-7 정보 은닉(information hiding)
+* 접근 제어자 살펴보기
+    - 접근 제어자(access modifier)  
+        : 클래스 내부의 변수나 메서드, 생성자에 대한 접근 권한을 지정하는 예약어
+        + public 접근 제어자  
+            : 외부 클래스에서 클래스 내부의 멤버 변수나 메서드에 접근 가능
+        + private 접근 제어자  
+            : 외부 클래스에서 클래스 내부의 멤버 변수나 메서드에 접근 불가능
+        ```
+        # private 접근 제어자 사용
+
+        package hiding;
+
+        public class Student{
+            int studentID;
+            private String studentName; // studentName 변수를 private로 선언
+            int grade;
+            String address;
+
+            public String getStudentNmae(){
+                return studentName;
+            }
+
+            public void setStudentName(String studentName){
+                this.studentName = studentName;
+            }
+        }
+
+        # private 변수 테스트(error)
+        package hiding;
+
+        public class StudentTest{
+            public static void main(String[] args){
+                Student studentLee = new Student();
+                studentLee.studentName = "Lee"; // error: private -> 외부 클래스인 StudentTest.java 클래스에서 접근 불가
+
+                System.out.println(studentLee.getStudentName());
+            }
+        }
+        ```
+    - get(), set() 메서드
+        : private  변수를 사용하는 메서드
+        ```
+        # get(), set() 메서드 사용
+        package hiding;
+
+        public class Student{
+            int studentID;
+            private String studentName;
+            int grade;
+            String address;
+
+            // private 변수인 studentName에 접근해 값을 가져오는 public get() 메서드
+            public String getStudentName(){
+                return studentName;
+            }
+
+            // private 변수인 studentName에 접근해 값을 지정하는 public set() 메서드
+            public void setStudentName(String studentname){
+                this.studentName = studentName;
+            }
+        }
+        ```
+        ```
+        # private 변수 테스트 재시도
+        package hiding;
+
+        public class StudentTest{
+            public static void main(String[] args){
+                Student studentLee = new Student();
+                studentLee.setstudentName("Lee"); // setStudentName() 메서드를 활용해 private 변수에 접근
+
+                System.out.println(studentLee.getStudentName());
+            }
+        }
+        ```
+* 정보 은닉(information hiding)  
+    : 클래스 내부에서 사용할 변수나 메서드를 private로 선언해서 외부에서 접근하지 못하도록 하는 것
+    - 자바에서는, 접근 제어자를 사용해서 구현
+    - 오류를 막을 수 있음
+    ```
+    # 멤버 변수를 public으로 선언
+    public class MyDate{
+        public int day;
+        public int month;
+        public int year;
+    }
+
+    public class MyDateTest{
+        public static void main(String[] args){
+            MyDate date = new Mydate;
+            date.month = 2;
+            date.day = 31; // 접근이 제한되지 않음 -> 2/31일은 존재하지 않지만 입력이 가능 -> 정보 오류를 막을 수 없음
+            date.year = 2018;
+        }
+    }
+
+    # 멤버 변수를 private로 선언
+    public class MyDate{
+        // 클래스 내부에서 사용할 변수나 메서드를 private로 선언 -> 외부에서 입력 불가능
+        private int day;
+        private int month;
+        private int year;
+
+        public void setDay(int day){ // 내부 메서드의 규칙에 따라 내부에서만 생성 가능
+            if(month == 2){
+                if(day < 1 || day > 28){
+                    System.out.println("error");
+                } else{
+                    this.day = day;
+                }
+            }
+        }
+    }
+    ```
+    ![image](https://user-images.githubusercontent.com/104348646/195063284-cedb5708-eb0e-4b4f-8a09-c4652bfec024.png)  
