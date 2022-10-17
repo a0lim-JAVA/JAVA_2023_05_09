@@ -25,7 +25,8 @@
         ```
 
 * 클래스에서 인터페이스 구현하기(implements)  
-    = 선언한 인터페이스를 클래스가 사용
+    = 선언한 인터페이스를 클래스가 사용  
+    ![image](https://user-images.githubusercontent.com/104348646/196173213-a08c49bb-32d5-4631-b464-2682133a9c3f.png)  
     ```
     # Calc 인터페이스를 Calculator 클래스에서 구현
     package interfaceex;
@@ -104,14 +105,14 @@
         + ex) CompleteCalc 클래스: Calculator형 & Calc형
         ```
         Calc calc = new CompleteCalc(); // Calc형으로 선언한 변수에 대입 가능
-        ```
-        (((그림 2)))
+        ```  
+        ![image](https://user-images.githubusercontent.com/104348646/196173366-de8bcc1b-c099-499e-8019-7636e6280b93.png)  
         + UserInfoWeb은 IUserInfoDao에 정의된 메소드 명세만 보고 Dao를 사용할 수 있고, Dao 클래스들은 IUserInfoDao에 정의된 메소드를 구현할 책임이 있다
     - 구현 코드가 없기 때문에, 여러 인터페이스 구현 가능
         + <-> 클래스 상속
     - 형 변환 시 사용할 수 있는 메서드는 인터페이스에 선언된 메서드만 사용할 수 있음
-        + ex) Calc형으로 선언한 변수에서 사용할 수 있는 메서드는 Calc 인터페이스에 선언한 메서드뿐
-        (((캡쳐 2)))
+        + ex) Calc형으로 선언한 변수에서 사용할 수 있는 메서드는 Calc 인터페이스에 선언한 메서드뿐  
+        ![image](https://user-images.githubusercontent.com/104348646/196173405-a49fba5a-b5dd-4c3f-a7b2-ffb817d01885.png)  
 
 ## 1902 인터페이스와 다형성
 * 인터페이스의 역할
@@ -123,9 +124,9 @@
     - 인터페이스를 사용하면 다형성을 구현해 확장성 있는 프로그램 개발 가능
     - Client Program에 기능 추가/다른 기능 사용 가능
     - 고객 상담 전화 배분 프로그램  
-        (((캡쳐 3)))
-        + Scheduler 인터페이스: 상담원에게 전화 업무를 배분하는 기능 구현
-        (((그림 3 p322)))
+        ![image](https://user-images.githubusercontent.com/104348646/196173790-04c116c2-6a96-438b-965b-6a4559cfb7b2.png)  
+        + Scheduler 인터페이스: 상담원에게 전화 업무를 배분하는 기능 구현  
+        ![image](https://user-images.githubusercontent.com/104348646/196173456-99518a05-4f36-44d0-b4d4-537faddfc278.png)
         ```
         # Scheduler 인터페이스 정의하기
 
@@ -227,8 +228,8 @@
                 scheduler.sendCallToAgent();
             }
         }
-        ```
-        (((그림 4: 출력화면)))
+        ```  
+        ![image](https://user-images.githubusercontent.com/104348646/196173843-dcdc90e2-43a7-4f85-9b23-2cf6a8e3ca3c.png)  
         
 * 클라이언트가 클래스를 사용하는 방법
     - 새로운 배분 정책을 추가하는 경우, 다른 정책들과 마찬가리로 Scheduler 인터페이스를 구현하는 새 클래스로 생성
@@ -398,8 +399,8 @@
         ```
 
 ## 10-4 인터페이스 활용하기
-* 한 클래스가 여러 인터페이스를 구현하는 경우
-    (((캡쳐 4)))
+* 한 클래스가 여러 인터페이스를 구현하는 경우  
+    ![image](https://user-images.githubusercontent.com/104348646/196173975-456b007c-285b-44af-9f60-0c6dacd279a7.png)  
     ```
     # 추상 메서드 Buy() 선언
 
@@ -538,8 +539,8 @@
         : 구현 코드를 통해 기능을 상속하지 않음
     - 인터페이스 간에도 상속 가능
     - 여러개를 동시에 상속 받기 가능
-    - 인터페이스를 정의할 때, 기능상 계층 구조가 필요한 경우에 사욛
-    (((그림 5)))
+    - 인터페이스를 정의할 때, 기능상 계층 구조가 필요한 경우에 사용  
+    ![image](https://user-images.githubusercontent.com/104348646/196174646-a1be26cd-deb9-4ffe-83fb-ca3bd9909ca2.png)  
         ```
         # 인터페이스 X에 추상 메서드 x()를 선언
 
@@ -610,8 +611,8 @@
         }
         ```
 
-* 인터페이스 구현과 클래스 상속 함께 쓰기
-    (((캡쳐 5)))
+* 인터페이스 구현과 클래스 상속 함께 쓰기  
+    ![image](https://user-images.githubusercontent.com/104348646/196174186-ccad47e2-d905-4d5e-b875-a7d528d97da1.png)  
     - Queue 인터페이스 구현
     - shelf 클래스를 상속받는 BookShelf 클래스: 책을 넣은 순서대로 꺼냄
         ```
@@ -689,8 +690,8 @@
                 System.out.println(shelfQueue.deQueue());
             }
         }
-        ```
-        (((그림 6)))
+        ```  
+        ![image](https://user-images.githubusercontent.com/104348646/196174292-5366ed6b-67ef-405b-8e4d-50ed799d6932.png)  
 
 * 실무에서 인터페이스를 사용하는 경우
     - 인터페이스를 이용한 다향성의 구현
