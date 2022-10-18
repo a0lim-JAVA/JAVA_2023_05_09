@@ -114,7 +114,7 @@
         + ex) Calc형으로 선언한 변수에서 사용할 수 있는 메서드는 Calc 인터페이스에 선언한 메서드뿐  
         ![image](https://user-images.githubusercontent.com/104348646/196173405-a49fba5a-b5dd-4c3f-a7b2-ffb817d01885.png)  
 
-## 1902 인터페이스와 다형성
+## 10-2 인터페이스와 다형성
 * 인터페이스의 역할
     - "Client Program"에 어떤 메서드를 제공하는지 미리 알려주는 명세(specification) -> interface의 정의만을 보고 사용 가능
     - "Client Code"와 서비스를 제공하는 "객체" 사이의 약속
