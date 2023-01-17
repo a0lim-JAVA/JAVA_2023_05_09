@@ -94,3 +94,71 @@
     ```
 
 * 정적 내부 클래스(static inner Class)
+  - 외부 클래스 생성과 무관하게 사용 + 정적 변수 사용
+  ```
+  package innerclass;
+
+  class OutClass{
+      private int num = 10;
+      private static int sNum = 20;
+
+      static class InStaticClass{
+          int inNum = 100;
+          static int sInNum = 200;
+
+          // 정적 내부 클래스의 일반 메서드
+          void inTest(){
+              // num += 10; // 외부 클래스의 인스턴스 변수 사용 불가
+              System.out.println("InStaticClass inNum = " + inNum); // 내부 - 인스턴스 변수 @@ 100
+              System.out.println("InStaticClass sInNum = " + sInNum); // 내부 - 정적 변수 @@ 200
+              System.out.println("InStaticClass sNum = " + sNum); // 외부 - 정적 변수 @@ 20
+          }
+
+          // 정적 내부 클래스의 정적 메서드
+          static void sTest(){
+              // num += 10;
+              // inNum += 10; // 외부+내부 클래스의 인스턴스 변수 사용 불가
+              System.out.println("OutClass sNum = " + sNum);
+              System.out.println("InStaticClass sInNum = " + sInNum);
+          }
+      }
+  }
+
+  public class InnerTest{
+      public static void main(String[] args){
+          ...
+          OutClass.InStaticClass sInClass = new OutClass.InStaticClass(); // 외부 클래스를 생성하지 않고 바로 정적 내부 클래스 생성 가능
+          sInClass.inTest(); // 외부 - 정적 변수 @@ 20
+          OutClass.InStaticClass.sTest(); // 내부 - 정적 변수 @@ 200
+      }
+  }
+  ```
+  - 다른 클래스에서 정적 내부 클래스 사용하기
+    ```
+    // 외부 클래스를 생성하지 않고 내부 클래스 자료형으로 바로 선언 + 생성 가능
+    OutClass.InStaticClass sInClass = new OutClass.InStaticClass();
+    
+    // 정적 내부 클래스에 선언한 메서드/변수는 private이 아닌 경우에, 다른 클래스에서도 바로 사용 가능
+    OutClass.InStaticClass.sTest();
+    ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
