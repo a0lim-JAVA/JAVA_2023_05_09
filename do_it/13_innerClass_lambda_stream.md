@@ -292,6 +292,165 @@
     ```
 
 * 람다식 사용하기
+```
+## 함수형 인터페이스 선언하기
+
+package lambda;
+
+public interface MyNumber {
+    int getMax(int num1, int num2); // 추상 메서드 선언
+}
+
+## 람다식 구현과 호출
+
+public class TestMyNumber{
+    public static void main(String[] args){
+        MyNumber max = (x, y) -> (x >= y) ? x : y; // max: 인터페이스형 변수
+        System.out.println(max.getMax(10, 20)); // 인터페이스형 변수로 메서드 호출
+    }
+}
+
+### cf) 람다식을 적용하지 않은 이전 코드
+
+(x, y) -> {
+    if(x >= y) return x;
+    else return y;
+        }
+```
+
+  - 함수형 프로그래밍은 순수 함수를 구현하고 호출 -> 외부 자료에 부수적인 영향(side effect)를 주지 않음
+    + 순수함수(pure function): 매개변수만을 사용해서 만드는 함수
+    + 함수를 기반으로, 자료를 입력받아 구현하는 방식
+    + 외부 자료에 영향을 미치지 않음 -> 병렬 처리, 안정되고 확장성 있는 프로그램 개발 가능
+    + 함수 기능이 자료에 독립적일 수 있도록 보장함 -> 다양한 자료에 같은 기능 수행 가능
+
+* 함수형 인터페이스  
+  - 메서드 이름이 없음 -> 메서드 선언 및 구현 어려움 -> 함수형 인터페이스 사용 및 메서드 선언  
+    ```
+    package lambda;
+
+    public interface MyNumber {
+        int getMax(int num1, int num2);
+        // int add(int num1, int num2); // 람다식은 하나의 메서드를 구현함 -> 인터페이스에서 두 개 이상의 메서드는 가질 수 없음
+    }
+    ```
+  - @FunctionalInterface 애노테이션  
+    : 함수형 인터페이스임을 명시함 -> 메서드가 두 개 이상 선언되면 error를 표시함
+    + 필수는 아님. 오류 방지용
+  
+* 객체 지향 프로그래밍 방식과 람다식 비교
+```
+## 인터페이스 구현
+
+package lambda;
+
+public interface StringConcat {
+    public void makeString(String s1, String s2);
+}
+
+## 1. 클래스에서 인터페이스 구현하는 방법
+### 추상 메서드 구현
+
+package lambda;
+
+public class StringConcatImpl implements StringConcat{
+    @Override
+    public void makeString(String s1, String s2){
+        System.out.println(s1 + ", " + s2);
+    }
+}
+### 메서드 테스트
+
+package lambda;
+
+public class TestStringConcat{
+    public static void main(String[] args){
+        String s1 = "Hello";
+        String s2 = "World";
+        String StringConcatImpl concat1 = new StringConcatImpl(); // 인스턴스 생성
+        concat1.makeString(s1, s2); // @@ "Hello, World"
+    }
+}
+
+## 2. 람다식으로 인터페이스 구현하는 방법
+### 메서드를 하나만 포함하는 함수형 인터페이스만 사용 가능
+
+package lambda;
+
+public class TestStringConcat{
+    public static void main(String[] args){
+        String s1 = "Hello";
+        String s2 = "World";
+        StringConcat concat2 = (s, v) -> System.out.println(s + ", " + v);
+        concat2.makeString(s1, s2);
+    }
+}
+```
+
+* 익명 객체를 생성하는 람다식
+  - 플로우: 람다식으로 메서드 구현 및 호출 -> 컴퓨터 내부에서 익명 클래스 생성 -> 익명 객체 생성
+    + 익명 내부 클래스는 클래스 이름 없이 인터페이스 자료형 변수에 바로 메서드 구현부를 생성 및 대입 가능
+    ```
+    String StringConcatImpl concat3 = new StringConcatImpl(){
+        @Override
+        public void makeString(String s1, String s2){
+            System.out.println(s1 + ", " + s2);
+        }
+    };
+    ```
+  - 람다식에서 사용하는 지역 변수
+    ```
+    ## 외부 메서드의 지역 변수인 i를 수정하는 경우
+    
+    public class TestStringConcat{
+        public static void main(String[] args){
+            ...
+            int i = 100;
+
+            StringConcat concat2 = (s, v) -> {
+                // i = 200; // error
+                System.out.println(i);
+                System.out.println(s + ", " + v);
+            };
+        }
+    }
+    ```
+    + 지역변수는 메서드 호출이 끝나면 메모리에서 사라짐 -> 익명 내부 클래스 내에서는 지역 변수가 상수로 변함(람다식도 동일)
+
+* 함수를 변수처럼 사용하는 람다식
+  |변수를 사용하는 경우|예시|
+  |--------------------|----|
+  |특정 자료형으로 변수 선언 후 값 대입해서 사용|int a = 10;|
+  |매개변수로 전달|int add(int x, int y);|
+  |메서드의 반환 값으로 반환|return num;|
+    
+  - 인터페이스형 변수에 람다식 대입하기
+    ```
+    PrintString lambdaStr  = s -> System.out.println(s);
+    lambdaStr.showString("hello lambda_1");
+    ```
+  - 매개변수로 전달하는 람다식
+  - 반환 값으로 쓰이는 람다식
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
