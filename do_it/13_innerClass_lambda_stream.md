@@ -430,20 +430,167 @@ public class TestStringConcat{
     lambdaStr.showString("hello lambda_1");
     ```
   - 매개변수로 전달하는 람다식
+    ```
+    package lambda;
+
+    public interface PrintString {
+        void showString(String str);
+    }
+
+    public class TestLambda{
+        public static void main(String[] args){
+            // 람다식: 인터페이스형 변수에 대입 + 람다식 구현부 호출
+            PrintString lambdaStr = s -> System.out.println(s);
+            lambdaStr.showString("hello lambda_1");
+            showMyString(lambdaStr); // 메서드의 매개변수로 람다식을 대입한 변수 전달 @@ "hello lambda_1"
+        }
+        public static void showMyString(PrintString p){
+            p.showString("hello lambda_2"); // @@ "hello lambda_2"
+        }
+    }
+    ```
   - 반환 값으로 쓰이는 람다식
+    ```
+    package lambda;
 
+    public interface PrintString {
+        void showString(String str);
+    }
 
+    public class TestLambda{
+        public static void main(String[] args){
+            ...
+            PrintString reStr = returnString(); // 변수로 반환받기
+            reStr.showString("hello"); // 메서드 호출
+        }
+        public static void showMyString(PrintString p){
+            p.showString("hello lambda_2"); // @@ "hello lambda_2"
+        }
+        public static PrintString returnString(){
+            return s -> System.out.println(s + "world"); // 변수처럼 사용 가능 @@ "hello world"
+        }
+    }
+    ```
 
+## 13-3 스트림
+* 스트림(stream)  
+  : 여러 자료 처리(정렬, 필터 등)에 대한 기능을 구현해 놓은 클래스
+  ```
+  int[] arr = {1, 2, 3, 4, 5};
+  Arrays.stream(arr).forEach(n -> System.out.println(n));
+  
+  // Arrays.stream(arr): 스트림 생성 부분
+  // forEach(n -> System.out.println(n)): 요소를 하나씩 꺼내서 출력하는 기능
+  ```
 
+* 스트림 연산
+  - 종류
+    + 중간 연산: 자료를 거르거나 변경해서 또 다른 자료를 내부적으로 생성
+    + 최종 연산: 생성된 내부 자료를 소모해 가면서 연산을 수행
+  - 중간 연산
+    : 조건에 맞는 결과를 추출해 내는 중간 역할
+    + filter(): 조건을 넣고 그 조건에 맞는 참인 경우만 추출
+      ```
+      ## 문자열의 길이가 5 이상인 경우만 출력
+      
+      sList.stream().filter(s -> s.length() >= 5).forEach(s -> System.out.println(s));
+      
+      // 스트림 생성: sList.stream()
+      // 중간 연산: filter(s -> s.length() >= 5)
+      // 최종 연산: forEach(s -> System.out.println(s))
+      ```
+    + map()  
+      : 요소들을 순회해서 다른 형식으로 변환 가능
+      ```
+      ## 고객 이름만 가져와서 출력
+      
+      customerList.stream().map(c -> c.getName()).forEach(s -> System.out.println(s));
+      
+      // 스트림 생성: customerList.stream()
+      // 중간 연산: map(c -> c.getName())
+      // 최종 연산: forEach(s -> System.out.println(s))
+      ```
+  - 최종 연산  
+    : 결과를 만드는 데 사용
+    + forEach()
+    + count()
+    + sum()
+    + reduce()
 
+* 스트림 생성하고 사용하기
+  - 정수 배열에 스트림 생성하고 사용하기
+    ```
+    package stream;
 
+    import java.util.Arrays;
 
+    public class IntArrayTest {
+        public static void main(String[] args){
+            int[] arr = {1, 2, 3, 4, 5};
 
+            int sumVal = Arrays.stream(arr).sum();
+            int count = (int)Arrays.stream(arr).count();
 
+            System.out.println(sumVal); // @@ 15
+            System.out.println(count); // @@ 5
+        }
+    }
+    ```
+  - Collection에서 스트림 생성하고 사용하기
+    + 생성  
+      : Stream<E> stream() -> 스트림 클래스를 반환하는 메서드
+     ```
+    List<String> sList = new ArrayList<String>();
+    sList.add("Tomas");
+    sList.add("Edward");
+    sList.add("Jack");
 
+    // 자료형 명시
 
+    Stream<String> stream = sList.stream();
+    ```
+  + 사용
+    ```
+    // forEach(): 각 요소를 하나씩 출력
+    
+    stream.forEach(s -> System.out.println(s));
+  
+    // sorted(): 정렬
+  
+    Stream<String> stream2 = sList.stream();
+    stream2.sorted().forEach(s -> System.out.println(s)); // 최종 연산 출력: forEach()
+    ```
 
+* 스트림의 특징
+  - 자료의 대상과 관계없이 동일한 연산을 수행한다
+    + 여러 자료 구조에 대해 요소 값 출력, 조건에 맞는 자료 추출 등의 작업을 일관성 있게 처리할 수 있는 메서드를 제공
+  - 한 번 생성하고 사용한 스트림은 재사용할 수 없다
+    + 어떤 자료에 대한 스트림을 생성하고 이 스트림에 메서드를 호출하여 연산을수행한 경우, 해당 스트림을 다시 다른 연산에 사용할 수 없음
+  - 스트림의 연산은 기존 자료를 변경하지 않는다
+    + 스트림 연산을 위해 사용하는 메모리 공간이 별도로 존재함
+  - 스트림의 연산은 중간 연산과 최종 연산이 있다
+    + 스트림에 중간 연산은 여러 개 적용 가능, 최종 연산은 맨 마지막에 한 번 적용
+    + 지연 연산(lazy evaluation): 중간 연산은 호출되었지만 최종 연산이 호출되지 않은 경우, 결과를 가져올 수 없음
 
+* reduce() 연산  
+  : 내부적으로 스트림의 요소를 하나씩 소모하면서 프로그래머가 직접 지정한 기능을 수행함
+  - reduce() 메서드의 정의
+    ```
+    T reduce(T identify, BinaryOperator<T> accumulator)
+  
+    // T identify: 초깃값
+    // BinaryOperator<T> accumulator: 수행해야 하는 기능
+    /// BinaryOperator 인터페이스: 두 매개변수로 람다식을 구현(= 수행해야 할 기능)
+    /// apply() 메서드 구현 필수 -> apply(): 두 개의 매개변수와 한 개의 반환값을 가짐(세 개 모두 같은 자료형임)
+    ```
+  - 예시
+    ```
+    Arrays.stream(arr).reduce(0, (a, b) -> a + b);
+  
+    // 0: 초깃값
+    // (a, b) -> a + b: 각 요소가 수행해야 할 기능
+    // (a, b): 전달되는 요소
+    ```
 
 
 
