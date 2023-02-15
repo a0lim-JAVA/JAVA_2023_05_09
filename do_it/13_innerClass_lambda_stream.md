@@ -591,20 +591,108 @@ public class TestStringConcat{
     // (a, b) -> a + b: 각 요소가 수행해야 할 기능
     // (a, b): 전달되는 요소
     ```
+  ```
+  ## reduce() 사용하기
+  
+  package stream;
 
+  import java.lang.reflect.Array;
+  import java.util.function.BinaryOperator;
 
+  public class CompareString implements BinaryOperator<String> {
+      @Override
+      // reduce() 메서드가 호출될 때 불리는 메서드: 두 문자열 길이를 비교(바이트 수가 더 긴 문자열을 반환)
+      public String apply(String s1, String s2){
+          if(s1.getBytes().length >= s2.getBytes().length) return s1;
+          else return s2;
+      }
+  }
 
+  public class ReduceTest{
+      public static void main(String[] args){
+          String[] greetings = {"안녕하세요", "hello", "Good Morning", "반갑습니다"};
+          // 람다식을 직접 구현하는 방법
+          System.out.println(Array.stream(greetings).reduce("", (s1, s2) -> {
+              if(s1.getBytes().length <= s2.getBytes().length)
+                  return s1;
+              else return s2;
+          })); // @@ "안녕하세요"
 
+          // BinaryOperator를 구현한 클래스를 사용하는 방법
+          String str = Array.stream(greeting).reduce(new CompareString()).get();
+          System.out.println(str); // @@ "안녕하세요"
+      }
+  }
+  ```
 
+* 스트림을 활용하여 여행객의 여행 비용 계산하기
+  ```
+  ## 고객 클래스 정의
 
+  package stream;
 
+  public class TravelCustomer {
+      private String name;
+      private int age;
+      private int price;
 
+      public TravelCustomer(String name, int age, int price){
+          this.name = name;
+          this.age = age;
+          this.price = price;
+      }
 
+      public String getname(){
+          return name;
+      }
 
+      public int getAge(){
+          return age;
+      }
 
+      public int getPrice(){
+          return price;
+      }
 
+      public String toString(){
+          return name + ", " + age + ", " +  price;
+      }
+  }                                                             
+  ```
+  ```
+  package stream;
 
+  import java.util.ArrayList;
+  import java.util.List;
 
+  public class TravelTest {
+      public static void main(String[] args){
+          // 고객 생성
+          TravelCustomer customerLee = new TravelCustomer("Lee", 40, 100);
+          TravelCustomer customerKim = new TravelCustomer("Kim", 20, 100);
+          TravelCustomer customerHong = new TravelCustomer("Hong", 13, 50);
 
+          // ArrayList에 고객 추가
+          List<TravelCustomer> customerList = new ArrayList<>();
+          customerList.add(customerLee);
+          customerList.add(customerKim);
+          customerList.add(customerHong);
 
+          // 고객 명단 출력
+          customerList.stream().map(c -> c.getname()).forEach(s -> System.out.println(s));
+          // @@ "Lee"
+          // @@ "Kim"
+          // @@ "Hong"
 
+          // 여행의 총 비용 계산
+          int total = customerList.stream().mapToInt(c -> c.getPrice()).sum(); // mapToInt: 값을 정수로 변환
+          System.out.println("총 여행 비용: " + total + "원"); // @@ 총 여행 비용: 250원
+
+          // 고객 중 20세 이상인 사람의 이름을 정렬해서 출력
+          customerList.stream().filter(c -> c.getAge() >= 20)
+                  .map(c -> c.getname()).sorted().forEach(s -> System.out.println(s));
+          // @@ "Lee"
+          // @@ "Kim"
+      }
+  }                                                          
+  ```
