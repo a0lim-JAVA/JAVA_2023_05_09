@@ -246,8 +246,8 @@
         }
       });
       ```
-
-(그림)
+  
+![image](https://user-images.githubusercontent.com/104348646/218961839-48f9ed25-54d0-4a19-ab09-4c76bcc8901c.png)  
 
 ## 13-2 람다식
 
