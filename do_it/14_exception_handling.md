@@ -35,41 +35,41 @@
     + 이클립스같은 개발 환경에서는 컴파일 오류가 발생하지 않음
     + ex) ArithmeticException: 0으로 숫자를 나누는 경우
     
+## 14-2 예외 처리하기
+* try-catch문
+  ```
+  try{
+      예외가 발생할 수 있는 코드 부분
+  } catch(처리할 예외 타입 e){
+      try 블록 안에서 예외가 발생했을 때 예외를 처리하는 부분
+  }
+  ```
+  ```
+  ## try-catch문 사용하기
+  
+  package exception;
 
+  public class ArrayExceptionHandling {
+      public static void main(String[] args){
+          int[] arr = new int[5];
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+      try{ // 예외 발생할 수 있는 코드: arr의 길이는 5, i의 개수는 6개
+          for(int i = 0; i <=5; i++){
+              arr[i] = i;
+              System.out.println(arr[i]);
+          }
+      } catch(ArrayIndexOutOfBoundsException e){ // ArrayIndexOutOfBoundsException: 배열에 저장하려는 값의 개수가 배열 범위를 벗어난 경우에 발생하는 예외
+          System.out.println(e); // 예외가 발생하면 수행함
+      }
+      System.out.println("프로그램 종료"); // try-catch문 없이 예외가 발생한 경우, 수행되지 않음
+      }
+  }
+  
+  // @@ 0
+  // @@ 1
+  // @@ 2
+  // @@ 3
+  // @@ 4
+  // @@ java.lang.ArrayIndexOutOfBoundsException
+  // @@ 프로그램 종료
+  ```
