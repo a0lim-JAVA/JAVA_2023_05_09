@@ -73,3 +73,26 @@
   // @@ java.lang.ArrayIndexOutOfBoundsException
   // @@ 프로그램 종료
   ```
+
+* 컴파일러에 의해 예외가 체크되는 경우
+  - 파일 입출력에서 발생하는 예외 처리하기
+    + 파일을 읽고 쓰기 위해 스트림(stream) 객체를 사용
+      ```
+      ## exception.ExceptionHandling1.java
+      
+      FileInputStream fis = new FileInputStream("a.txt"); // FileInputStream: 데이터를 바이트 단위로 읽음
+      // 'FileNotFoundExcption이 처리되지 않음' -> Surround with try/catch(try-catch문 사용)
+      // 읽으려는 파일이 없는 경우, JVM에서 FileNotFoundException 예외 클래스가 생성됨
+      
+      ## Surround with try/catch 사용: 예외가 발생할 위험이 있는 코드가 try 안에 들어감
+      
+      try {
+            fis = new FileInputStream("a.txt");
+        } catch (FileNotFoundException e) { // 발생 가능한 예외: FileNotFoundException
+            throw new RuntimeException(e);
+        }
+        
+      // 예외 처리 이후에도 프로그램은 계속 수행됨 
+      ```
+
+* try-catch-finally문
