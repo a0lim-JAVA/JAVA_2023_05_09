@@ -172,7 +172,37 @@
       }
       ```
 
+## 15-3 바이트 단위 스트림
+* InputStream  
+  : 추상 메서드를 포함한 추상클래스
+  - 하위 스트림 클래스가 상속받아 각 클래스 역할에 맞게 추상 메서드 기능을 구현함
+  - 바이트 단위로 읽는 스트림 중 최상위 스트림
+  - 하위 클래스
+    + FileInputStream  
+      : 파일에서 바이트 단위로 자료를 읽음
+    + ByteArrayInputStream  
+      : byte 배열 메모리에서 바이트 단위로 자료를 읽음
+    + FilterInputStream  
+      : 기반 스트림에서 자료를 읽을 때, 추가 기능을 제공하는 보조 스트림의 상위 클래스
+  - 메서드
+    + int read()  
+      : 입력 스트림으로부터 한 바이트의 자료를 읽음. 읽은 자료의 바이트 수를 반환(int)
+    + int read(byte[] b)  
+      : 입력 스트림으로부터 b[] 크기의 자료를 b[]에 읽음. 읽은 자료의 바이트 수를 반환(int)
+    + int read(byte[] b, int off, int len)  
+      : 입력 스트림으로부터 b[] 크기의 자료를 b[]의 off 변수 위치부터 저장하고, len만큼 읽음. 읽은 자료의 바이트 수를 반환(int)
+    + void close()  
+      : 입력 스트림과 연결된 대상 리소스를 닫음
+      + ex) FileInputStream인 경우, 파일 닫음
 
-
-
-
+* FileInputStream  
+  : 파일에서 바이트 단위로 자료를 읽어 들일 때 사용
+  - 생성자
+    + FileInputStream(String name)  
+      : 파일 이름 name(경로 포함)을 매개변수로 받아 입력 스트림을 생성
+    + FileInputStream(File f)  
+      : File 클래스 정보를 매개변수로 받아 입력 스트림을 생성
+    ```
+    ## FileInputStream 사용하기
+    
+    ```
