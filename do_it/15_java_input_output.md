@@ -205,4 +205,253 @@
     ```
     ## FileInputStream 사용하기
     
+    package stream.inputstream;
+
+    import java.io.FileInputStream;
+    import java.io.IOException;
+
+    public class FileInputStreamTest1 {
+        public static void main(String[] args){
+            FileInputStream fis = null;
+
+            try{
+                fis = new FileInputStream("input.txt"); // input.txt 파일 입력 스트림 생성
+                System.out.println(fis.read());
+                System.out.println(fis.read());
+                System.out.println(fis.read());
+            } catch (IOException e){ // IOException: FileNotFoundException의 상위 예외 클래스
+                System.out.println(e);
+            } finally {
+                try {
+                    fis.close(); // 열린 스트림은 finally 블록에서 닫음 -> 위의 예외로 인해 스트림이 생성되지 않음 -> NullPointerException
+                } catch (IOException e) {
+                    System.out.println(e);
+                } catch (NullPointerException e){ // 스트림이 null인 경우
+                    System.out.println(e);
+                }
+            }
+            System.out.println("end"); // 예외처리가 되어도 프로그램이 중단되지 않고, 출력됨
+        }
+    }
     ```
+  - 파일에서 자료 읽기
+    ```
+    System.out.println((char)fis.read());
+    ```
+  - 파일 끝까지 읽기
+    + 파일 내용의 크기를 모르는 경우
+    ```
+    // try-with-resources문 사용
+    
+    package stream.inputstream;
+
+    import java.io.FileInputStream;
+    import java.io.FileNotFoundException;
+    import java.io.IOException;
+
+    public class FileInputStreamTest2 {
+        public static void main(String[] args){
+            try(FileInputStream fis = new FileInputStream("input.txt")) {
+                // i 값이 -1이 아닌 동안(읽을 자료가 있는 동안) read() 메서드로 한 바이트를 반복해 읽음
+                int i;
+                while((i = fis.read()) != -1){
+                    System.out.println((char)i);
+                }
+                System.out.println("end");
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // @@ a
+    // @@ b
+    // @@ c
+    // @@ end
+    ```
+  - int read(byte[] b) 메서드로 읽기
+    : 선언한 바이트 배열의 크기만큼 한꺼번에 자료를 읽음
+    ```
+    ## byte 배열로 읽기 - A to Z
+    
+    package stream.inputstream;
+
+    import java.io.FileInputStream;
+    import java.io.IOException;
+
+    public class FileInputStreamTest3 {
+        public static void main(String[] args){
+            try(FileInputStream fis = new FileInputStream("input2.txt")) {
+                byte[] bs = new byte[10];
+                int i;
+                while((i = fis.read(bs)) != -1){
+                    for(byte b : bs){
+                        System.out.println((char)i);
+                    }
+                    System.out.println(": " + i + "바이트 읽음");
+                }
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+            System.out.println("end");
+        }
+    }
+
+    // @@ ABCDEFGHIJ: 10바이트 읽음
+    // @@ KLMNOPQRST: 10바이트 읽음
+    // @@ UVWXYZQRST: 6바이트 읽음
+    // @@ end
+    ```
+    + 남은 공간에는 이전에 남아 있던 자료가 입력됨
+      (p572 그림)
+      
+      ```
+      ## 기존: 전체 배열을 출력
+      
+      for(byte b : bs){
+        System.out.println((char)b);
+      }
+      
+      // @@ UVWXYZQRST: 6바이트 읽음
+      
+      ## 수정: 바이트 수만큼(i) 출력
+      
+      for(int k = 0; k < i; k++){
+        System.out.println(bs[k]);
+      }
+      
+      // @@ UVWXYZ: 6바이트 읽음
+      ```
+
+* OutputStream
+  - 바이트 단위로 쓰는 스트림 중 최상위 스트림
+  - 자료의 출력 대상에 따라 다른 스트림을 제공함
+  - 클래스
+    + FileOutputSream  
+      : 바이트 단위로 파일에 자료를 씀
+    + ByteArrayOutputStream  
+      : Byte 배열에 바이트 단위로 자료를 씀
+    + FilterOutputStream  
+      : 기반 스트림에서 자료를 쓸 때, 추가 기능을 제공하는 보조 스트림의 상위 클래스
+  - 메서드
+    + void write(int b)  
+      : 한 바이트를 출력
+    + void write(byte[] b)  
+      : b[] 배열에 있는 자료를 출력
+    + void write(byte[] b, int off, int len)  
+      : b[] 배열에 있는 자료의 off 위치부터 len 개수만큼 자료를 출력
+    + void flush()  
+      : 출력을 위해 잠시 자료가 머무르는 출력 버퍼를 강제로 비워 자료를 출력
+    + void close()  
+      : 출력 스트림과 연결된 대상 리소스를 닫음. 출력 버퍼가 비워짐
+      + ex) FileOutputStream: 파일을 닫음
+
+* FileOutputStream  
+  : 파일에 바이트 단위 자료를 출력하기 위해 사용
+  - 생성자
+    + FileOutputStream(String name)  
+      : 파일 이름 name(경로 포함)을 매개변수로 받아 출력 스트림을 생성
+    + FileOutputStream(String name, boolean append)  
+      + 파일 이름 name(경로 포함)을 매개변수로 받아 입력 스트림을 생성
+      + append가 true면 파일 스트림을 닫고 다시 생성할 때 파일의 끝에 이어서 사용함(default: false)
+    + FileOutputStream(File f, )  
+      : File 클래스 정보를 매개변수로 받아 출력 스트림을 생성
+    + FileOutputStream(File f, boolean append)  
+      + File 클래스 정보를 매개변수로 받아 출력 스트림을 생성
+      + append가 true면 파일 스트림을 닫고 다시 생성할 때 파일의 끝에 이어서 사용함(default: false)
+
+  - write() 메서드 사용하기
+    ```
+    package stream.outputstream;
+
+    import java.io.FileOutputStream;
+    import java.io.IOException;
+
+    public class FileOutputStreamTest1 {
+        public static void main(String[] args){
+            try(FileOutputStream fos = new FileOutputStream("output.txt")){
+                // FileOutputStream: 파일에 숫자를 쓰면 해당하는 아스키 코드 값으로 변환됨
+                fos.write(65);
+                fos.write(66);
+                fos.write(67);
+            } catch(IOException e){
+                e.printStackTrace();
+            }
+            System.out.println("end"); // @@ end
+        }
+    }
+
+    // cf) fos = new FileOutputStream("output.txt", true) // 파일에 이어서 씀
+    ```
+
+  - write(byte[] b)메서드 사용하기
+    ```
+    package stream.outputstream;
+
+    import java.io.FileOutputStream;
+    import java.io.IOException;
+
+    public class FileOutputStreamTest2 {
+        public static void main(String[] args) throws IOException {
+            FileOutputStream fos = new FileOutputStream("output.txt", true); // 향상된 try-with-resources문(자바 9부터 제공)
+            try(fos){
+                byte[] bs = new byte[26];
+                byte data = 65; // 'A'의 아스키 값
+                // A부터 Z까지 배열에 넣기
+                for(int i = 0; i < bs.length; i++){
+                    bs[i] = data;
+                    data++;
+                }
+                fos.write(bs); // 배열을 한꺼번에 출력
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            System.out.println("end");
+        }
+    }
+    
+    // @@ ABCDEFGHIJKLMNOPQRSTUVWXYZ
+    ```
+  - write(byte[] b, int off, int len) 메서드 사용하기
+    + 배열 자료 중 일부를 출력할 때 사용
+    ```
+    package stream.outputstream;
+
+    import java.io.FileOutputStream;
+    import java.io.IOException;
+
+    public class FileOutputStreamTest3 {
+        public static void main(String[] args){
+            try(FileOutputStream fos = new FileOutputStream("output3.txt")) {
+                byte[] bs = new byte[26];
+                byte data = 65;
+                for(int i = 0; i < bs.length; i++){
+                    bs[i] = data;
+                    data++;
+                }
+                fos.write(bs, 2, 10);
+            } catch(IOException e) {
+                e.printStackTrace();
+            }
+            System.out.println("end");
+        }
+    }
+
+    // @@ CDEFGHIJKL
+    ```
+  - flush() 메서드  
+    : 강제로 자료를 출력함
+    + 자료의 양이 출력할 만큼 많지 않은 경우 -> 파일에 쓰이지 않거나 전송되지 않는 경우가 생김 -> flush() 메서드로 강제 출력함
+  - close() 메서드
+    + close() 메서드 안에서 flush() 메서드를 호출하는 경우 -> 출력 버퍼가 지워지면서 남아 있는 자료가 모두 출력됨
+
+
+
+
+
+
+
+
+
