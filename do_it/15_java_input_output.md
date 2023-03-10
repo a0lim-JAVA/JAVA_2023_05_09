@@ -499,10 +499,212 @@
 
 * Writer  
   : 문자 단위로 출력하는 스트림 중 최상위 스트림
-  - FileWriter  
-    : 파일에 문자 단위로 출력하는 스트림 클래스
-  - OutputStreamWriter  
-    : 파일에 바ㅣ트 단위로 출력한 자료를 문자로 변환해주는 보조 스트림
-  - BufferedWriter  
-    : 문자로 쓸 때 배열을 제공하여 한꺼번에 쓸 수 있는 기능을 제공해주는 보조 스트림
+  - 클래스
+    + FileWriter  
+      : 파일에 문자 단위로 출력하는 스트림 클래스
+    + OutputStreamWriter  
+      : 파일에 바ㅣ트 단위로 출력한 자료를 문자로 변환해주는 보조 스트림
+    + BufferedWriter  
+      : 문자로 쓸 때 배열을 제공하여 한꺼번에 쓸 수 있는 기능을 제공해주는 보조 스트림
+  - 메서드
+    + void write(int c)  
+      : 한 문자를 파일에 출력
+    + void write(char[] buf)  
+      : 문자 배열 buf의 내용을 파일에 출력
+    + void write(char[] buf, int off, int len)  
+      : 문자 배열 buf의 off 위치에서부터 len 개수의 문자를 파일에 출력
+    + void write(String str)  
+      : 문자열 str을 파일에 출력
+    + void write(String str, int off, int len)  
+      : 문자열 str의 off번째 문자부터 len 개수만큼 파일에 출력
+    + void flush()  
+      : 파일에 출력하기 전에, 자료가 있는 공간(출력 버퍼)를 비워 출력
+    + void close()  
+      : 파일과 연결된 스트림을 닫음. 출력 버퍼도 비워짐
+
+* FileWriter  
+  : 생성자를 사용해서 스트림을 생성함
+  - 파일이 존재하지 않으면 파일을 생성 (FileOutputStream과 유사)
+  - 생성자
+    + FileWriter(String name)  
+      : 파일 이름 name(경로 포함)을 매개변수로 받아 출력 스트림을 생성함
+    + FileWriter(String name, boolean append)  
+      + 파일 이름 name(경로 포함)을 매개변수로 받아 출력 스트림을 생성함
+      + append 값이 true면, 파일 스트림을 닫고 다시 생성할 때 파일 끝에 이어서 씀(default: false)
+    + FileWriter(File f, )  
+      : File 클래스 정보를 매개변수로 받아 출력 스트림을 생성
+    + FileWriter(File f, boolean append)
+      + File 클래스 정보를 매개변수로 받아 출력 스트림을 생성
+      + append 값이 true면, 파일 스트림을 닫고 다시 생성할 때 파일 끝에 이어서 씀(default: false)
+    ```
+    package stream.writer;
+
+    import java.io.FileWriter;
+    import java.io.IOException;
+
+    public class FileWriterTest {
+        public static void main(String[] args){
+            try(FileWriter fw = new FileWriter("writer.txt")) {
+                fw.write('A'); // 문자 하나 출력 @@ A
+                char buf[] = {'B', 'C', 'D', 'E', 'F', 'G'};
+
+                fw.write(buf); // 문자 배열 출력 @@ B, C, D, E, F, G
+                fw.write("안녕하세요"); // 문자열 출력 @@ 안녕하세요
+                fw.write(buf, 1, 2); // 문자 배열의 일부 출력 @@ CD 
+                fw.write("65"); // 숫자를 그대로 출력 // 65
+            } catch(IOException e) {
+                e.printStackTrace();
+            }
+            System.out.println("end"); // 출력화면
+        }
+    }
+    ```
+
+## 15-5 보조 스트림
+* 보조 스트림(Wrapper 스트림)  
+  : 보조 기능을 추가하는 스트림
+  - 어떤 보조 스트림이 더해지느냐에 따라 스트림 기능이 추가됨
+  - 자신이 감싸고 있는 스트림이 읽거나 쓰는 기능을 수행할 때, 보조 기능을 추가함
+
+* FilterInputStream과 FilteroutputStream
+  - 보조 스트림의 상위 클래스
+  - 모든 보조 스트림이 상속받음
+  - 생성자
+    + protected FilterInputStream(InputStream in)
+    + public FilterOutputStream(OutputStream out)
+  - 다른 생성자를 제공하지 않음  -> 상속받은 보조 클래스도 다른 스트림을 매개변수로 받아 상위 클래스를 호출해야 함
+  - 보통 상속받은 하위 클래스를 사용함
+  - 보조 스트림의 생성자에 항상 기반 스트림만 매개변수로 전달되는 것은 아님(매개변수로 다른 보조 스트림도 가능)
+  (p540 그림)
+  
+* InputStreamReader와 OutputStreamWriter
+  - 바이트 자료만 입력되는 스트림(표준 입출력 System.in 스트림, 네트워크에서 소켓이나 인터넷이 연결되었을 때 읽거나 쓰는 스트림)이 있음
+  - 바이트 스트림을 문자로 변환해주는 보조 스트림
+  - InputStreamReader의 생성자
+    + InputStreamReader(InputStream in)  
+      : InputStream 클래스를 생성자의 매개변수로 받아 Reader를 생성함
+    + InputStreamReader(InputStream in, Charset cs)  
+      : InputStream 클래스를 매개변수로 받아 Reader를 생성함
+    + InputStreamReader(InputStream in, CharsetDecoder dec)  
+      : InputStream과 CharsetDecoder를 매개변수로 받아 Reader를 생성함
+    + inputStreamReader(InputStream in, String charsetName)  
+      : InputStream과 String으로 문자 세트 이름을 받아 Reader를 생성함
+    + 모든 생성자는 InputStream(바이트 단위로 읽는 스트림)을 매개변수로 받음
+    ```
+    package stream.decorator;
+
+    import java.io.FileInputStream;
+    import java.io.IOException;
+    import java.io.InputStreamReader;
+
+    public class InputStreamReaderTest {
+        public static void main(String[] args){
+            try(InputStreamReader isr = new InputStreamReader(new FileInputStream(("reader.txt")))) { // InputStreamReader(보조 스크림)의 매개변수: FileInputStream(기반 스트림)
+                int i;
+                while((i = isr.read()) != -1){ // 파일 끝까지 반환해 보조 스트림으로 자료를 읽음
+                    System.out.println((char)i); // @@ 안녕하세요
+                }
+                } catch(IOException e){
+                e.printStackTrace();
+            }
+        }
+    }
+    ```
+
+* Buffered 스트림  
+  : 이미 생성된 스트림에 배열 기능을 추가해, 더 빠르게 입출력을 실행할 수 있는 버퍼링 기능을 제공함
+  - 한 바이트/문자 단위로 입출력하는 경우, 프로그램 수행 속도가 느려짐
+  - 클래스
+    + BufferedInputStream  
+      : 바이트 단위로 읽는 스트림에 버퍼링 기능을 제공
+    + BufferedOutputStream  
+      : 바이트 단위로 출력하는 스트림에 버퍼링 기능을 제공
+    + BufferedReader  
+      : 문자 단위로 읽는 스트림에 버퍼링 기능을 제공
+    + BufferedWriter  
+      : 문자 단위로 출력하는 스트림에 버퍼링 기능을 제공
+  - 생성자
+    + BufferedInputStream(InputStream in)  
+      : InputStream 클래스를 생성자의 매개변수로 받아 BufferedInputStream을 생성
+    + BufferedInputStream(InputStream in, int size)  
+      : InputStream 클래스와 버퍼 크기를 생성자의 매개변수로 받아 BufferedInputStream을 생성
+    ```
+    package stream.decorator;
+
+    import java.io.FileInputStream;
+    import java.io.FileOutputStream;
+    import java.io.IOException;
+
+    public class FileCopyTest {
+        public static void main(String[] args){
+            long millisecond = 0;
+            try(FileInputStream fis = new FileInputStream("a.zip");
+            FileOutputStream fos = new FileOutputStream("copy.zip")) { // a.zip을 copy.zip으로 복사함
+                millisecond = System.currentTimeMillis(); // 파일 복사를 시작하기 전 시간
+                int i;
+                while((i = fis.read()) != -1){
+                    fos.write(i);
+                }
+                millisecond = System.currentTimeMillis() - millisecond; // 파일을 복사하는 데 걸리는 시간을 계산
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+            System.out.println(millisecond); // @@ 23274
+        }
+    }
+    ```
+    ```
+    package stream.decorator;
+
+    import java.io.*;
+
+    public class BufferedStreamTest {
+        public static void main(String[] args){
+            long millisecond = 0;
+            try(FileInputStream fis = new FileInputStream("a.zip");
+                FileOutputStream fos = new FileOutputStream("copy.zip");
+                BufferedInputStream bis = new BufferedInputStream(fis);
+                BufferedOutputStream bos = new BufferedOutputStream(fos)) {
+                millisecond = System.currentTimeMillis();
+                int i;
+                while((i = bis.read()) != -1){
+                    bos.write(i);
+                }
+                millisecond = System.currentTimeMillis() - millisecond;
+            } catch(IOException e){
+                e.printStackTrace();
+            }
+            System.out.println(millisecond); // @@ 79
+        }
+    }
+    ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
