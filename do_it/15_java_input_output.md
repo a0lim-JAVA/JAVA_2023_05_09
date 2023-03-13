@@ -12,8 +12,9 @@
     + 출력 스트림  
       : 편집 화면에 사용자가 쓴 글을 파일에 저장할 때 사용하는 스트림
       + ex) OutputStream, Writer로 끝남
-    + 스트림은 단방향으로 자료가 이동함 -> 입출력이 동시에 작동할 수 없음
-
+    + 스트림은 단방향으로 자료가 이동함 -> 입출력이 동시에 작동할 수 없음  
+    ![image](https://user-images.githubusercontent.com/104348646/224688563-e178dfd8-e5f9-4d10-aa2b-596b20ad346c.png)  
+  
   - 바이트 단위 스트림과 문자 단위 스트림
     + 기본: 바이트 단위로 입출력이 이뤄짐
       + ex) Reader, Writer로 끝남
@@ -30,7 +31,8 @@
     + 보조 스트림
       : 다른 스트림에 부가 기능을 제공
       + 직접 읽고 쓰는 기능이 없음
-      + ex) InputStreamReader, OutputStreamWriter, BufferedInputStream, BufferedOutputStream 등
+      + ex) InputStreamReader, OutputStreamWriter, BufferedInputStream, BufferedOutputStream 등  
+   ![image](https://user-images.githubusercontent.com/104348646/224688355-2832a1c1-58e6-4f80-b073-f7a56191b325.png)  
 
 ## 15-2 표준 입출력
 
@@ -304,8 +306,8 @@
     // @@ UVWXYZQRST: 6바이트 읽음
     // @@ end
     ```
-    + 남은 공간에는 이전에 남아 있던 자료가 입력됨
-      (p572 그림)
+    + 남은 공간에는 이전에 남아 있던 자료가 입력됨  
+      ![image](https://user-images.githubusercontent.com/104348646/224688073-351128a2-5f67-4213-a129-69f603ec9b64.png)  
       
       ```
       ## 기존: 전체 배열을 출력
@@ -678,33 +680,294 @@
         }
     }
     ```
+  - 소켓 통신에서 스트림 사용하기
+    + 소켓(socket)  
+      : 통신에 사용하는 네트워크 연결 리소스
+    ```
+    ## Socket 클래스: 소켓 통신을 위해 제공
+    Socket socket = new Socekt();
+    InputStream is = socket.getInputStream();
+    
+    ##
+    Socket socket = new Socket();
+    BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputSteam())); // getInputStream(): InputStream이 반환됨(바이트 단위 스트림) -> 문자 깨짐 -> 문자로 변환 -> BufferedReader: 속도 증가
+    BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+    ```
 
+* DataInputStream과 DataOutputStream
+  - 메모리에 저장된 0, 1 상태를 그대로 읽거나 씀
+  - 자료형의 크기가 그대로 보존됨
+  - 생성자
+    + DataInputStream(InputStream in)  
+      : InputStream을 생성자의 매개변수로 받아 DataInputStream을 생성함
+    + DataOutputStream(OutputStream out)  
+      : OutputStream을 생성자의 매개변수로 받아 DataOutputStream을 생성함
+  - DataInputStream의 자료형별 메서드(DataOutputStream은 read()에 대응하는 write() 메서드를 제공)
+    + byte readByte()  
+      : 1바이트를 읽어 반환
+    + boolean readBoolean()  
+      : 읽은 자료가 0이 아니면 true, 0이면 false를 반환
+    + char readChar()
+      : 한 문자를 읽어 반환
+    + short readShort()  
+      : 2바이트를 읽어 정수 값을 반환
+    + int readInt()  
+      : 4바이트를 읽어 정수 값을 반환
+    + long readLong()  
+      : 8바이트를 읽어 정수 값을 반환
+    + float readFloat()  
+      : 4바이트를 읽어 실수 값을 반환
+    + double readDouble()  
+      : 8바이트를 읽어 실수 값을 반환
+    + String readUTF()  
+      : 수정된 UTF-8 인코딩 기반으로 문자열을 읽어 반환
+  ```
+  package stream.decorator;
 
+  import java.io.*;
 
+  public class DataStreamTest {
+      public static void main(String[] args){
+          try(FileOutputStream fos = new FileOutputStream("data.txt");
+              DataOutputStream dos = new DataOutputStream(fos)) {
+              dos.writeByte(100);
+              dos.writeChar('A');
+              dos.writeInt(10);
+              dos.writeFloat(3.14f);
+              dos.writeUTF("Test");
+          } catch(IOException e){
+              e.printStackTrace();
+          }
+          try(FileInputStream fis = new FileInputStream("data.txt");
+              DataInputStream dis = new DataInputStream(fis)) { // 파일에 쓴 것과 동일한 순서, 동일한 메서드로 읽어야 함
+              System.out.println(dis.readByte()); // @@ 100
+              System.out.println(dis.readChar()); // @@ A
+              System.out.println(dis.readInt()); // @@ 10
+              System.out.println(dis.readFloat()); // @@ 3.14
+              System.out.println(dis.readUTF()); // @@ Test
+          } catch (IOException e) {
+              e.printStackTrace();
+          }
+      }
+  }
+  ```
+  - 데코레이터 패턴  
+    : 객체의 결합 을 통해 기능을 동적으로 유연하게 확장 할 수 있게 해주는 패턴
+    + 자바의 입출력 스트림 클래스가 데코레이터 패턴임
+    + 데코레이터(장식자)  
+      : 기능이 동적으로 추가되는 클래스
+      + 여러 클래스에 다양하게 적용 가능
+      ```
+      WhippedCreamCoffee whippedCreamCoffee = new WhippedCreamCoffee(new MochaCoffe(new LatteCoffee(new KenyaCoffee())); // 휘핑 크림이 올라간 모카 커피
+      // 실제 커피 클래스: KenyaCoffee
+      // 데코레이터 클래스: LatteCoffee, MochaCoffe, WhippedCreamCoffee
+      ```
 
+## 15-6 직렬화
+* 직렬화와 역직렬화
+  - 직렬화(serialization)  
+    : 인스턴스의 어느 순간 상태를 그대로 저장하거나 네트워크를 통해 전송하는 것
+    + 인스턴스 내용을 연속 스트림으로 만드는 것
+  - 역직렬화(deserialization)  
+    : 저장된 내용이나 전송받은 내용을 다시 복원하는 것
+  - 생성자
+    + ObjectInputStream(InputStream in)  
+      : InputStream을 생성자의 매개변수로 받아 ObjectInputStream을 생성
+    + ObjectOutputStream(OutputStream out)  
+      : OutputStream을 생성자의 매개변수로 받아 ObjectOutputStream을 생성
+    ```
+    ## 직렬화에 사용할 Person 클래스를 만들어서 인스턴스로 생성한 후, 파일에 썼다가 복원
+    
+    package stream.serialization;
 
+    import com.sun.xml.internal.ws.developer.Serialization;
 
+    import java.io.*;
+    import java.lang.annotation.Annotation;
 
+    class Person implements Serialization { // implements Serialization: 직렬화하겠다는 의미
+        private static final long serialVersionUID = -1503252402544036183L; // 버전 관리를 위한 정보
+        String name;
+        String job;
 
+        public Person() {}
 
+        public Person(String name, String job){
+            this.name = name;
+            this.job = job;
+        }
 
+        public String toString(){
+            return name + ", " + job;
+        }
+    }
 
+    public class SerializationTest{
+        public static void main(String[] args) throws ClassNotFoundException{ // ClassNotFoundException: 역직렬화 시, 클래스 정보가 존재하지 않을 수 있음
+            Person personAhn = new Person("Ahn", "CEO");
+            Person personKim = new Person("Kim", "CFO");
 
+            try(FileOutputStream fos = new FileOutputStream("serial.out");
+                ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+                // 직렬화: personAhn, personKim의 값을 파일에 씀
+                oos.writeObject(personAhn);
+                oos.writeObject(personKim);
+            } catch(IOException e){
+                e.printStackTrace();
+            }
+            try(FileInputStream fis = new FileInputStream("serial.out");
+                ObjectInputStream ois = new ObjectInputStream(fis)) {
+                // 역직렬화: personAhn, personKim의 값을 파일에서 읽어들임
+                Person p1 = (Person)ois.readObject();
+                Person p2 = (Person)ois.readObject();
 
+                System.out.println(p1); // @@ Ahn, CEO
+                System.out.println(p2); // @@ Kim, CFO
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+    }
+    ```
+  - transient 예약어
+    + 직렬화될 수 없는 클래스(Socket 클래스 등)이 인스턴스 변수로 있거나, 직렬화하지 않을 변수가 있는 경우에 사용
+    + 해당 변수를 직렬화되고 복원되는 과정에서 제외함
+    ```
+    String name;
+    transient String job;
+    
+    // @@ Ahn, null
+    // @@ Kim, null
+    ```
+  - serialVersionUID를 사용한 버전 관리
+    + 직렬화할 시, 자동으로 serialVersionUID를 생성해서 정보를 저장함
+    + 역직렬화 시, serialVersionUID를 비교(클래스가 수정/변경되었는지 확인)
+    + 클래스 내용이 변경된 경우, 오류 발생
+    + 클래스의 버전 관리 필요
+      + Add generated serial version ID: 버전 번호 생성
+  - Externalizable
+    + 객체의 직렬화와 역직렬화를 프로그래머가 직접 세밀하게 제어하기 위해 사용
+    + 프로그래머가 직접 메서드에 그 내용을 구현함
+    ```
+    ## Externalizable Test
+    
+    package stream.serialization;
 
+    import java.io.*;
 
+    public class Dog implements Externalizable {
+        String name;
 
+        public Dog () {}
 
+        // 구현 필요
+        @Override
+        public void writeExternal(ObjectOutput out) throws IOException {
+            out.writeUTF(name);
+        }
 
+        // 구현 필요
+        @Override
+        public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException{
+            name = in.readUTF();
+        }
 
+        public String toString(){
+            return name;
+        }
+    }
 
+    public class ExternalizableTest{
+        public static void main(String[] args) throws IOException, ClassNotFoundException{
+            Dog myDog = new Dog();
+            myDog.name = "puppy";
 
+            FileOutputStream fos = new FileOutputStream("external.out");
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
 
+            try(fos; oos) {
+                oos.writeObject(myDog);
+            } catch(IOException e){
+                e.printStackTrace();
+            }
 
+            FileInputStream fis = new FileInputStream("external.out");
+            ObjectInputStream ois = new ObjectInputStream(fis);
 
+            Dog dog = (Dog)ois.readObject();
+            System.out.println(dog); // @@ puppy
+        }
+    }
+    ```
 
+## 15-7 그 외 입출력 클래스
+* File 클래스
+  : 파일 자체의 경로나 정보 확인, 파일 생성 가능
+  + 입출력 기능은 없음
+  ```
+  package stream.others;
 
+  import java.io.File;
+  import java.io.IOException;
+  import java.sql.SQLOutput;
 
+  public class FileTest {
+      public static void main(String[] args) throws IOException{
+          File file = new File("D:\\newFile.txt"); // 해당 경로에 File 클래스 생성(아직 실제 파일이 생성되지는 않음)
+          file.createNewFile(); // 실제 파일 생성
 
+          // File 클래스가 제공하는 메서드: 파일의 속성을 반환함
+          System.out.println(file.isFile()); // @@ true
+          System.out.println(file.isDirectory()); // @@ false
+          System.out.println(file.getName()); // @@ newFile.txt
+          System.out.println(file.getAbsolutePath()); // @@ D:\newFile.txt
+          System.out.println(file.getPath()); // @@ D:\newFile.txt
+          System.out.println(file.canRead()); // @@ true
+          System.out.println(file.canWrite()); // @@ true
 
+          file.delete(); // 파일 삭제
+      }
+  }
+  ```
 
+* RandomAccessFile 클래스  
+  : 임의의 위치로 이동해 자료를 읽음
+  - 파일 입출력을 동시에 할 수 있음
+  - 생성자
+    + RandomAccessFile(File file, String mode)  
+      : 입출력을 할 File과 입출력 mode를 매개변수로 받음
+      + mode에는 r(읽기 전용), rw(읽고 쓰기 기능)을 사용할 수 있음
+    + RandomAccessFile(String file, String mode)  
+      : 입출력을 할 파일 이름을 문자열로 받고 입출력 mode를 매개변수로 받음
+      + mode에는 r(읽기 전용), rw(읽고 쓰기 기능)을 사용할 수 있음
+  - DataInput, DataOutput 인터페이스가 구현됨 -> DataInputStream, DataOutputStream과 같이 다양한 자료형을 다룰 수 있음
+  ```
+  package stream.others;
+
+  import java.io.IOException;
+  import java.io.RandomAccessFile;
+
+  public class RandomAccessFileTest {
+      public static void main(String[] args) throws IOException{
+          RandomAccessFile rf = new RandomAccessFile("random.txt", "rw");
+          rf.writeInt(100);
+          System.out.println(rf.getFilePointer()); // int 크기: 4 @@ 4
+          rf.writeDouble(3.14);
+          System.out.println(rf.getFilePointer()); // double 크기: 8 @@ 12
+          rf.writeUTF("안녕하세요");
+          System.out.println(rf.getFilePointer()); // 수정된 UTF-8 사용 한글(3바이트) * 5 + null문자(2바이트): 17 @@ 29
+
+          rf.seek(0); // 파일 포인터 위치를 맨 처음으로 옮기고 위치를 출력함(옮기지 않을 시, EOFException 오류 발생)
+          System.out.println(rf.getFilePointer()); // @@ 0
+
+          int i = rf.readInt();
+          double d = rf.readDouble();
+          String str = rf.readUTF();
+
+          System.out.println(rf.getFilePointer()); // @@ 19
+          System.out.println(i);
+          System.out.println(d);
+          System.out.println(str);
+      }
+  }
+  ```
