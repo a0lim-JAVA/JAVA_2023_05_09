@@ -96,3 +96,117 @@
       ```
 
 * try-catch-finally문
+  - 사용한 시스템 리소스를 사용 후 반드시 close() 메서드로 닫아야 함
+  - 끝나지 않고 계속 수행되는 서비스가 있음 -> 자원의 한계
+  - finally 블록은 어떤 경우에도 반드시 수행됨(return이 있어도)
+    ```
+    try{
+        예외가 발생할 수 있는 부분
+            } catch(처리할 예외 타입 e){
+        예외를 처리하는 부분
+            } finally {
+        항상 수행되는 부분
+            }
+    ```
+    ```
+    package exception;
+
+    import java.io.FileInputStream;
+    import java.io.FileNotFoundException;
+    import java.io.IOException;
+
+    public class ArrayExceptionHandling3 {
+        public static void main(String[] args){
+            FileInputStream fis = null;
+
+            try{
+                fis = new FileInputStream("a.txt");
+            } catch (FileNotFoundException e){ // 입력받은 파일이 없는 경우의 예외처리
+                System.out.println(e);
+                return;
+            } finally { // 파일 리소스를 닫음
+                if(fis != null){
+                    try {
+                        fis.close(); // 파일 입력 스트림 닫기
+                    } catch (IOException e){ // 예외처리
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+                System.out.println("always"); // return과 상관 없이 항상 수행됨
+            }
+            System.out.println("also");
+        }
+    }
+    ```
+
+* try-with-resources문
+  - Closeable과 AutoCloseable 인터페이스를 구현함
+  - close()를 명시적으로 호출하지 않아도 정상/예외 경우 모두 close() 메서드가 호출됨
+  - AutoCloseable 인터페이스
+    + close() 메서드가 있어서, close()를 명시적으로 호출하지 않아도 close() 메서드 부분이 호출됨
+    ```
+    package exception;
+
+    public class AutoCloseObj implements AutoCloseable{
+        @Override
+        // close() 메서드 구현
+        public void close() throws Exception{
+            System.out.println("close");
+        }
+    }
+    ```
+    ```
+    ## try-with-resources문 test: 정상적으로 종료되는 경우
+    
+    package exception;
+
+    public class AutoCloseTest {
+        public static void main(String[] args) {
+            try (AutoCloseObj obj = new AutoCloseObj()) { // 사용할 리소스 선언
+            } catch (Exception e) {
+                System.out.println("exception");
+            }
+        }
+    }
+    ```
+    ```
+    ## 리소스를 여러 개 생성하는 경우, ;으로 구분함
+    try(A a = new A(); B b = new B()){
+    ...
+      } catch(Exception e{
+      ...
+      }
+    ```
+    ```
+    ## try-with-resources문 test: 예외가 발생해서 종료되는 경우
+    
+    package exception;
+
+    public class AutoCloseTest {
+        public static void main(String[] args) {
+            try (AutoCloseObj obj = new AutoCloseObj()) {
+                throw new Exception(); // 강제 예외 발생
+            } catch (Exception e) {
+                System.out.println("exception");
+            }
+        }
+    }
+
+    // @@ close
+    // @@ exception
+    ```
+  - 향상된 try-with-resources문
+    + 자바 9부터 가능
+    + try문의 괄호 안에 외부에서 선언한 변수 사용 가능 -> 가독성 향상, 반복 선언 감소
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
