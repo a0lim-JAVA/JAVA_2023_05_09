@@ -21,8 +21,8 @@
       - 프로그램에서 제어 가능
       - ex) 파일이 없는 경우, 네트워크 연결이 안 된 경우, 배열 요소가 없는 경우 등
   - 오류에 대한 전체 클래스  
-    : 오류 클래스는 모두 Throwable 클래스에서 상속받음
-    (p 488 그림)
+    : 오류 클래스는 모두 Throwable 클래스에서 상속받음  
+    ![image](https://user-images.githubusercontent.com/104348646/224966988-725778d9-fd78-4155-9706-6468206f615c.png)  
     
 * 예외 클래스의 종류
   - Exception 클래스가 최상위 클래스
@@ -199,14 +199,180 @@
   - 향상된 try-with-resources문
     + 자바 9부터 가능
     + try문의 괄호 안에 외부에서 선언한 변수 사용 가능 -> 가독성 향상, 반복 선언 감소
+    ```
+    ## 기존 try-with-resources문
     
+    AutoCloseObj obj = new AutoCloseObj();
+    try (AutoCloseObj obj2 = obj){ // 다른 참조 변수로 다시 선언 필요
+        throw new Exception();
+    } catch(Exception e){
+        System.out.println("exception");
+    }
     
+    ## 향상된 try-with-resources문
     
+    AutoCloseObj obj = new AutoCloseObj();
+    try (obj){ // 외부에서 선언한 변수를 그대로 사용 가능
+        throw new Exception();
+    } catch(Exception e){
+        System.out.println("exception");
+    }
+    ```
     
-    
-    
-    
-    
-    
-    
-    
+## 예외 처리 미루기
+* 예외 처리를 미루는 throws 사용하기
+  ```
+  package exception;
+
+  import java.io.FileInputStream;
+  import java.io.FileNotFoundException;
+
+  public class ThrowsException {
+      public Class loadClass(String fileName, String className) throws // 두 예외를 메서드가 호출될 때 처리하도록 미룸
+              FileNotFoundException, ClassNotFoundException{
+          FileInputStream fis = new FileInputStream(fileName); // FileNotFoundException 발생 가능
+          Class c = Class.forName(className); // ClassNotFoundException 발생 가능
+          return c;
+      } 
+
+      public static void main(String[] args){
+          ThrowsException test = new ThrowsException();
+          test.loadClass("a.txt", "java.lang.String"); // 메서드를 호출할 때 예외를 처리함
+      }
+  }
+  ```
+  - throws를 활용하여 예외 처리 미루기
+    + Add throws declaration
+      : main() 함수 선언 부분에 throws FileNotFoundException, ClassNotFoundException을 추가하고 예외 처리를 미룸
+      + 미룬 예외 처리는 main() 함수를 호출하는 JVM으로 보내짐 -> 대부분의 프로그램이 비정상 종료됨
+    + Surround with try/multi-catch
+      : 하나의 catch문에서 여러 예외를 한 문장으로 처리함
+      ```
+      public static void main(String[] args){
+          ThrowsException test = new ThrowsException();
+          // 생성
+          try{
+              test.loadClass("a.txt", "java.lang.String");
+          } catch(FileNotFoundException | ClassNotFoundException e){ // 여러 예외를 한 문장으로 처리함
+              //TODO Auto-generated catch block
+              e.printStackTrace();
+          }
+      }
+      ```
+    + Surround with try/catch
+      : 예외 상황의 수 만큼 catch문이 생성됨
+      + 각 예외 상황마다 다르게 처리하는 경우(다른 방식으로 처리, 다른 로그를 남김 등)에 사용
+      + 메서드가 다른 여러 코드에서 호출되어 사용되는 경우, 호출하는 코드의 상황에 맞게 로그를 남기거나 예외처리를 하는 것이 좋음
+      ```
+      public static void main(String[] args){
+          ThrowsException test = new ThrowsException();
+          // 생성
+          try {
+              test.loadClass("a.txt", "java.lang.String");
+          // 각 예외 상황마다 다른 방식으로 처리함    
+          } catch (FileNotFoundException e){
+              //TODO Auto-generated catch block
+              e.printStackTrace();
+          } catch (ClassNotFoundException e){
+              //TODO Auto-generated catch block
+              e.printStackTrace();
+          }
+      }
+      ```
+
+* 다중 예외 처리
+  - 필수적이지 않지만 예외 처리가 필요한 경우, 컴파일러에 체크되지 않음 -> 맨 마지막에 Exception 클래스를 사용한 catch 블록 추가
+  - ex) 배열 사용 시, 배열의 크기보다 큰 위치에 접근하는 경우 -> RunTimeException - ArrayIndexOutOfBoundsException 예외 발생
+    ```
+    package exception;
+
+    import java.io.FileInputStream;
+    import java.io.FileNotFoundException;
+
+    public class ThrowsException {
+        public Class loadClass(String fileName, String className) throws
+                FileNotFoundException, ClassNotFoundException{
+            FileInputStream fis = new FileInputStream(fileName);
+            Class c = Class.forName(className);
+            return c;
+        }
+
+        public static void main(String[] args){
+            ThrowsException test = new ThrowsException();
+            try {
+                test.loadClass("a.txt", "java.lang.String");
+            } catch (FileNotFoundException e){
+                e.printStackTrace();
+            } catch (ClassNotFoundException e){
+                e.printStackTrace();
+            } catch(Exception e){ // Exception 클래스: 그 외 예외 상황 처리
+                e.printStackTrace();
+            }
+        }
+    }
+    ```
+  - 다중 예외 처리에서의 주의 사항
+    + Exception 클래스를 맨 마지막에 사용해야 함(catch문을 선언한 순서대로 검사함. Exception 클래스가 상위 클래스로, 모든 예외가 이미 처리됨)
+
+## 14-4 시용자 정의 예외
+* 사용자 정의 예외 클래스 구현하기
+  ```
+  package exception;
+
+  public class IDFormatException extends Exception{
+      public IDFormatException(String message){ // message: 생성자의 매개변수로, 예외 상황 메세지를 받음
+          super(message);
+      }
+  }
+  ```
+  ```
+  ## 사용자 정의 예외 test
+
+  package exception;
+
+  import java.io.IOException;
+  import java.sql.SQLOutput;
+
+  public class IDFormatTest {
+      private String userID;
+
+      public String getUserID(){
+          return userID;
+      }
+
+      // ID에 대한 제약 조건 구현
+      public void setUserID(String userID) throws IDFormatException { // IDFormatException 예외를 set(UserID()) 메서드가 호출될 때 처리하도록 미룸
+          if(userID == null){
+              throw new IDFormatException("ID는 null일 수 없습니다"); // 강제로 예외 발생시킴(자바에서 제공하는 예외가 아님 -> 직접 생성 필요)
+          }
+          else if(userID.length() < 8 || userID.length() > 20){
+              throw new IDFormatException("ID는 8자 이상 20자 이하로 쓰세요"); // 강제로 예외 발생시킴(자바에서 제공하는 예외가 아님 -> 직접 생성 필요)
+          }
+      this.userID = userID;    
+      }
+
+      public static void main(String[] args){
+          IDFormatTest test = new IDFormatTest();
+
+          // ID 값이 null인 경우
+          String userID = null;
+          try {
+              test.setUserID(userID);
+          } catch (IOException e){
+              System.out.println(e.getMessage());
+          }
+
+          // ID 값이 8자 이하인 경우
+          userID = "1234567";
+          try {
+              test.setUserID(userID);
+          } catch (IOException e){
+              System.out.println(e.getMessage());
+          }
+      }
+  }
+  ```
+
+* 로그(log)
+  - 어떤 상황에서 오류가 났는지, 시스템에서 어떤 메서드를 호출했고, 어떻게 매개변수를 전달했는지 오류 현상만 보고는 알 수 없음
+  - 정보 의미에 따라 레벨을 나누어 관리
