@@ -117,3 +117,6 @@ LocalDate.from(LocalDateTime.now());
 ```
 LocalDate.now().atTime(2, 30);
 ```
+
+## LocalDate 필드에 InvalidData가 오는 경우
+* ex) 2/31을 입력 -> null로 입력됨
