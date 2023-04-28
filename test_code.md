@@ -43,5 +43,59 @@
   - BDD 구조  
     : given / when / then
 
+* 예시
+  ```
+  @Autowired
+  private Controller controller;
+  @Autowired
+  private Repository repository;
+  
+  private RequestDto requestDto;
+  private ResponseDto responseDto;
+  private Entity entity;
+  
+  // test에서 사용할 예제 생성
+  @BeforeEach
+  void seteup(){
+    this.requestDto = new RequestDto(
+      "홍길동",
+      1
+    );
+    
+  ...
+  }
+  
+  // test 성공 예제
+  @Test
+  @DisplayName("success - create Entity with normal case")
+  void createEntityShouldSuccess(){
+    controller.createEntity(this.requestDto);
+  }
+  
+  // test 실패 예제: ValidationError(정규표현식)
+  @Test
+  @DisplayName("fail - create Entity with invalid name")
+  void createCompanyWithInvalidNameShouldFail(){
+    RequestDto dto = this.requestDto;
+    dto.setEntityName(1L); // 문자열과 type이 맞지 않음
+    
+    Assertions.assertThatThrowBy(() -> controller.createEntity(dto))
+          .isInstanceOf(ConstraintViolationException.class)
+          .hasMessageContaining("type is String");
+  }
+    
+  // test 실패 예제: BusinessException
+  @Test
+  @DisplayName("fail - read Entity with invalid id")
+  void readCompanyWithInvalidIdShouldFail(){
+    RequestDto dto = this.requestDto;
+    dto.setEntityId(0L); // list에 없는 데이터를 불러옴
+    Assertions.assertThatThrowBy(() -> controller.readeEntity(dto))
+          .isInstanceOf(BusinessException.class)
+          .extracting("errorCode", InstanceOfAssertFactories, type(ErrorCode.class))
+          .isEqualTo(ErrorCode.Entity_NOT_FOUND);
+  }
+  ```
+
 # 모의 객체를 생성하는 테스트
 ## Mockito
