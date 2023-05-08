@@ -1,6 +1,6 @@
 ## version
-* java version "1.8.0_341"
-* javac 1,8.0_341
+* java version "11.0.19"
+* javac "11.0.19"
 
 * 특징
   - 무료
